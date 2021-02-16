@@ -15,7 +15,8 @@ class PostsController extends Controller
      */
     public function index()
     {
-        $posts = Post::all();
+        $user = Auth::user();
+        $posts = Post::where('user_id', $user->id)->get();
         return view('posts.index', compact('posts'));
     }
 
@@ -38,13 +39,25 @@ class PostsController extends Controller
     public function apiStore(Request $request)
     {
         $user = Auth::user();
-        $post = Post::create([
+        request()->validate([
+            'post_id' => 'required',
+            'post_title' => 'required',
+        ]);
+        $postData = [
             'post_id' => $request->post_id,
+            'user_id' => $user->id
+        ];
+        $post = Post::where($postData)->first();
+        $postData = array_merge($postData, [
             'post_title' => $request->post_title,
             'post_content' => $request->post_content,
-            'user_id' => $user->id
         ]);
-        return ['status' => 'success', 'message' => 'Post created', 'post' => $post];
+        if (empty($post)) {
+            $post = Post::create($postData);
+        } else {
+            $post->update($postData);
+        }
+        return ['status' => 'success', 'message' => 'Post saved', 'post' => $post];
     }
 
 
