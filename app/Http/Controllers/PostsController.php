@@ -5,9 +5,16 @@ namespace App\Http\Controllers;
 use App\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class PostsController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -16,7 +23,7 @@ class PostsController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $posts = Post::where('user_id', $user->id)->get();
+        $posts = $user->posts()->get();
         return view('posts.index', compact('posts'));
     }
 
@@ -27,7 +34,7 @@ class PostsController extends Controller
      */
     public function create()
     {
-        //
+        return view('posts.create');
     }
 
     /**
@@ -69,7 +76,19 @@ class PostsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $user = Auth::user();
+        $data = request()->validate([
+            'post_title' => 'required',
+            'post_id' => Rule::unique('posts')->where(function ($query) use ($user) {
+                return $query->where('user_id', $user->id);
+            })
+        ]);
+
+        $data['post_content'] = $request->post_content;
+
+        $user->posts()->create($data);
+
+        return redirect('/posts');
     }
 
     /**
@@ -80,7 +99,7 @@ class PostsController extends Controller
      */
     public function show(Post $post)
     {
-        //
+        return view('posts.show', compact('post'));
     }
 
     /**
@@ -91,7 +110,7 @@ class PostsController extends Controller
      */
     public function edit(Post $post)
     {
-        //
+        return view('posts.edit', compact('post'));
     }
 
     /**
@@ -103,7 +122,7 @@ class PostsController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        //
+        $this->authorize('update', $post);
     }
 
     /**
