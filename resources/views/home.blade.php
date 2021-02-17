@@ -15,6 +15,9 @@
                     @endif
 
                     You are logged in!
+                    <br>
+                    <br>
+                    <a href="/posts">Posts</a>
                 </div>
             </div>
         </div>

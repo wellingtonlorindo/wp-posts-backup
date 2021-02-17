@@ -16,7 +16,8 @@
                     <p>
                         {{ __($post->post_content) }}
                     </p>
-                <a href="javascript:history.back()">Back</a>
+                <a class="btn" href="javascript:history.back()">Back</a>
+                <a class="btn btn-primary" href="{{ route('posts.edit',$post->id) }}">Edit</a>
                 </div>
 
             </div>

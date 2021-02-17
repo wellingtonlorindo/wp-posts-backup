@@ -63,7 +63,7 @@
                             </div>
                         </div>
                     </form>
-                <a href="javascript:history.back()">Back</a>
+                <a class="btn" href="javascript:history.back()">Back</a>
                 </div>
             </div>
         </div>

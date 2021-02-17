@@ -3,16 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Post;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class PostsController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth');
+    }
+
+    private function getPostIdRules(User $user)
+    {
+        return [
+            Rule::unique('posts')->where(function ($query) use ($user) {
+                return $query->where('user_id', $user->id);
+            }),
+            'required'
+        ];
     }
 
     /**
@@ -79,16 +89,15 @@ class PostsController extends Controller
         $user = Auth::user();
         $data = request()->validate([
             'post_title' => 'required',
-            'post_id' => Rule::unique('posts')->where(function ($query) use ($user) {
-                return $query->where('user_id', $user->id);
-            })
+            'post_id' => $this->getPostIdRules($user)
         ]);
 
         $data['post_content'] = $request->post_content;
 
         $user->posts()->create($data);
 
-        return redirect('/posts');
+        return redirect("/posts")
+            ->with("success","Post stored successfully");;
     }
 
     /**
@@ -122,7 +131,23 @@ class PostsController extends Controller
      */
     public function update(Request $request, Post $post)
     {
+        $user = Auth::user();
         $this->authorize('update', $post);
+        $rules = [
+            'post_title' => 'required',
+        ];
+
+        if ($request->post_id != $post->post_id) {
+            $rules['post_id'] = $this->getPostIdRules($user);
+        }
+
+        $data = request()->validate($rules);
+        $data['post_content'] = $request->post_content;
+
+        $post->update($data);
+
+        return redirect("/posts")
+            ->with("success","Post updated successfully");
     }
 
     /**
@@ -133,6 +158,8 @@ class PostsController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+        $post->delete();
+        return redirect("/posts")
+            ->with("success","Post deleted successfully");
     }
 }
