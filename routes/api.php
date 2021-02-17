@@ -17,4 +17,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::middleware('auth:api')->get('/posts', 'PostsController@apiIndex');
+
 Route::middleware('auth:api')->post('/posts', 'PostsController@apiStore');
+
+Route::middleware('auth:api')->patch('/posts/{post}', 'PostsController@apiUpdate');
+
+Route::middleware('auth:api')->delete('/posts/{post}', 'PostsController@apiDestroy');

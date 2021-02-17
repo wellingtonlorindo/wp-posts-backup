@@ -30,6 +30,17 @@ class PostsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function apiIndex()
+    {
+        $posts = Auth::user()->posts()->get();
+        return ['status' => 'success', 'posts' => $posts];
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
         $user = Auth::user();
@@ -55,25 +66,7 @@ class PostsController extends Controller
      */
     public function apiStore(Request $request)
     {
-        $user = Auth::user();
-        request()->validate([
-            'post_id' => 'required',
-            'post_title' => 'required',
-        ]);
-        $postData = [
-            'post_id' => $request->post_id,
-            'user_id' => $user->id
-        ];
-        $post = Post::where($postData)->first();
-        $postData = array_merge($postData, [
-            'post_title' => $request->post_title,
-            'post_content' => $request->post_content,
-        ]);
-        if (empty($post)) {
-            $post = Post::create($postData);
-        } else {
-            $post->update($postData);
-        }
+        $post = $this->store($request, true);
         return ['status' => 'success', 'message' => 'Post saved', 'post' => $post];
     }
 
@@ -82,9 +75,10 @@ class PostsController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  bool  $returnData
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, bool $returnData = false)
     {
         $user = Auth::user();
         $data = request()->validate([
@@ -94,7 +88,11 @@ class PostsController extends Controller
 
         $data['post_content'] = $request->post_content;
 
-        $user->posts()->create($data);
+        $post = $user->posts()->create($data);
+
+        if ($returnData) {
+            return $post;
+        }
 
         return redirect("/posts")
             ->with("success","Post stored successfully");;
@@ -129,15 +127,29 @@ class PostsController extends Controller
      * @param  \App\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Post $post)
+    public function apiUpdate(Request $request, Post $post)
     {
-        $user = Auth::user();
+        $post = $this->update($request, $post, true);
+        return ['status' => 'success', 'message' => 'Post updated', 'post' => $post];
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Post  $post
+     * @param  bool  $returnData
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, Post $post,  bool $returnData = false)
+    {
         $this->authorize('update', $post);
         $rules = [
             'post_title' => 'required',
         ];
 
         if ($request->post_id != $post->post_id) {
+            $user = Auth::user();
             $rules['post_id'] = $this->getPostIdRules($user);
         }
 
@@ -145,6 +157,9 @@ class PostsController extends Controller
         $data['post_content'] = $request->post_content;
 
         $post->update($data);
+        if ($returnData) {
+            return $post;
+        }
 
         return redirect("/posts")
             ->with("success","Post updated successfully");
@@ -156,9 +171,27 @@ class PostsController extends Controller
      * @param  \App\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Post $post)
+    public function apiDestroy(Post $post)
     {
-        $post->delete();
+        $post = $this->destroy($post, true);
+        return ['status' => 'success', 'message' => 'Post deleted'];
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Post  $post
+     * @param  bool  $returnData
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Post $post, bool $returnData = false)
+    {
+        $this->authorize('delete', $post);
+        $response = $post->delete();
+        if ($returnData) {
+            return $response;
+        }
+
         return redirect("/posts")
             ->with("success","Post deleted successfully");
     }
