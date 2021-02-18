@@ -59,15 +59,35 @@ class PostsController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a post or a list of posts.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function apiStore(Request $request)
     {
-        $post = $this->store($request, true);
-        return ['status' => 'success', 'message' => 'Post saved', 'post' => $post];
+        $postsData = $request->json()->all();
+        if (empty($postsData[0])) {
+            $postsData = [$postsData];
+        }
+
+        $user = Auth::user();
+        $arrayPosts = [];
+        foreach ($postsData as $postData) {
+            $request->json()->replace($postData);
+            $data = $request->validate([
+                'post_title' => 'required',
+                'post_content' => 'required',
+                'post_id' => 'required'
+            ]);
+
+            $arrayPosts[] = $user->posts()->updateOrCreate(
+                ['user_id' => $user->id, 'post_id' => $postData['post_id']],
+                $data
+            );
+        }
+
+        return ['status' => 'success', 'message' => 'Post saved', 'posts' => $arrayPosts];
     }
 
 
