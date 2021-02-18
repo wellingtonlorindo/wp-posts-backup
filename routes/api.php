@@ -19,6 +19,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::middleware('auth:api')->get('/posts', 'PostsController@apiIndex');
 
+Route::middleware('auth:api')->get('/posts/{post}', 'PostsController@apiShow');
+
 Route::middleware('auth:api')->post('/posts', 'PostsController@apiStore');
 
 Route::middleware('auth:api')->patch('/posts/{post}', 'PostsController@apiUpdate');

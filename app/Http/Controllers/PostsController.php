@@ -125,8 +125,21 @@ class PostsController extends Controller
      * @param  \App\Post  $post
      * @return \Illuminate\Http\Response
      */
+    public function apiShow(Post $post)
+    {
+        $this->authorize('view', $post);
+        return ['status' => 'success', 'post' => $post];
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Post  $post
+     * @return \Illuminate\Http\Response
+     */
     public function show(Post $post)
     {
+        $this->authorize('view', $post);
         return view('posts.show', compact('post'));
     }
 
