@@ -8,7 +8,7 @@
                 <div class="card-header">{{ __('Post') }}</div>
 
                 <div class="card-body">
-                    <form method="POST" action="/post/{{ $post->id }}">
+                    <form method="POST" action="{{ route('posts.update',$post->id) }}">
                         @csrf
                         @method('PATCH')
 
