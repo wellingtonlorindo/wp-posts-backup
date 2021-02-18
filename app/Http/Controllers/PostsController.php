@@ -83,6 +83,7 @@ class PostsController extends Controller
         $user = Auth::user();
         $data = request()->validate([
             'post_title' => 'required',
+            'post_content' => 'required',
             'post_id' => $this->getPostIdRules($user)
         ]);
 
@@ -117,6 +118,7 @@ class PostsController extends Controller
      */
     public function edit(Post $post)
     {
+        $this->authorize('view', $post);
         return view('posts.edit', compact('post'));
     }
 
@@ -146,6 +148,7 @@ class PostsController extends Controller
         $this->authorize('update', $post);
         $rules = [
             'post_title' => 'required',
+            'post_content' => 'required',
         ];
 
         if ($request->post_id != $post->post_id) {
