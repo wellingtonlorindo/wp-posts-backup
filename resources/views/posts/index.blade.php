@@ -14,7 +14,12 @@
                       @endif
                     </div>
                     <div class="card-header">Posts</div>
-                    <a class="btn btn-info" href="{{ route('posts.create') }}">Add new</a>
+
+                    <div class="row" style="padding: 10px">
+                        <div class="col-12">
+                            <a class="btn btn-primary" href="{{ route('posts.create') }}">Add new</a>
+                        </div>
+                    </div>
                     <div class="card-body">
                         <table>
                             <tr>
