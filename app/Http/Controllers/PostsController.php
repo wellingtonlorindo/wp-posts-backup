@@ -15,14 +15,21 @@ class PostsController extends Controller
         $this->middleware('auth');
     }
 
-    private function getPostIdRules(User $user)
+    public function rules(): array
     {
         return [
-            Rule::unique('posts')->where(function ($query) use ($user) {
-                return $query->where('user_id', $user->id);
-            }),
-            'required'
+            'post_title' => 'required',
+            'post_content' => 'required',
+            'post_id' => ['required', 'integer']
         ];
+    }
+
+    private function getPostIdUniqueRule()
+    {
+        $user = Auth::user();
+        return Rule::unique('posts')->where(function ($query) use ($user) {
+            return $query->where('user_id', $user->id);
+        });
     }
 
     /**
@@ -75,11 +82,7 @@ class PostsController extends Controller
         $arrayPosts = [];
         foreach ($postsData as $postData) {
             $request->json()->replace($postData);
-            $data = $request->validate([
-                'post_title' => 'required',
-                'post_content' => 'required',
-                'post_id' => 'required'
-            ]);
+            $data = $request->validate($this->rules());
 
             $arrayPosts[] = $user->posts()->updateOrCreate(
                 ['user_id' => $user->id, 'post_id' => $postData['post_id']],
@@ -101,14 +104,11 @@ class PostsController extends Controller
     public function store(Request $request, bool $returnData = false)
     {
         $user = Auth::user();
-        $data = request()->validate([
-            'post_title' => 'required',
-            'post_content' => 'required',
-            'post_id' => $this->getPostIdRules($user)
-        ]);
 
+        $rules = $this->rules();
+        $rules['post_id'][] = $this->getPostIdUniqueRule();
+        $data = request()->validate($rules);
         $data['post_content'] = $request->post_content;
-
         $post = $user->posts()->create($data);
 
         if ($returnData) {
@@ -179,18 +179,13 @@ class PostsController extends Controller
     public function update(Request $request, Post $post,  bool $returnData = false)
     {
         $this->authorize('update', $post);
-        $rules = [
-            'post_title' => 'required',
-            'post_content' => 'required',
-        ];
 
+        $rules = $this->rules();
         if ($request->post_id != $post->post_id) {
-            $user = Auth::user();
-            $rules['post_id'] = $this->getPostIdRules($user);
+            $rules['post_id'][] = $this->getPostIdUniqueRule();
         }
 
         $data = request()->validate($rules);
-        $data['post_content'] = $request->post_content;
 
         $post->update($data);
         if ($returnData) {
