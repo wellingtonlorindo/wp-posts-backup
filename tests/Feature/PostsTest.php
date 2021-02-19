@@ -3,12 +3,11 @@
 namespace Tests\Feature;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use App\Post;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 
 class PostsTest extends TestCase
 {
-    use DatabaseTransactions;
+    use DatabaseMigrations;
 
     private $user;
 
