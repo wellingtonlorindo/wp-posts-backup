@@ -28,7 +28,7 @@ class ApiPostsTest extends TestCase
         ];
 
         $response = $this->withHeaders([
-            'token' => $this->user->api_token,
+            'Authorization' => 'Bearer '.$this->user->api_token,
         ])->json('POST', '/api/posts', $post);
 
         $response->assertStatus(200)
@@ -45,7 +45,7 @@ class ApiPostsTest extends TestCase
         $posts[] = $post;
         $posts[] = $anotherPost;
         $response = $this->withHeaders([
-            'token' => $this->user->api_token,
+            'Authorization' => 'Bearer '.$this->user->api_token,
         ])->json('POST', '/api/posts', $posts);
 
         $response->assertStatus(200)
@@ -63,7 +63,7 @@ class ApiPostsTest extends TestCase
         ];
 
         $response = $this->withHeaders([
-            'token' => null,
+            'Authorization' => null,
         ])->json('POST', '/api/posts', $post);
 
         $response->assertStatus(401)
@@ -72,7 +72,7 @@ class ApiPostsTest extends TestCase
             ]);
 
         $response = $this->withHeaders([
-            'token' => 'aaaaaaaaaaaaaaaaaaaaaaaa',
+            'Authorization' => 'Bearer '.'aaaaaaaaaaaaaaaaaaaaaaaa',
         ])->json('POST', '/api/posts', $post);
 
         $response->assertStatus(401)
@@ -85,7 +85,7 @@ class ApiPostsTest extends TestCase
     {
         $post = factory('App\Post')->create(['user_id' => $this->user->id]);
         $response = $this->withHeaders([
-            'token' => $this->user->api_token,
+            'Authorization' => 'Bearer '.$this->user->api_token,
         ])->json('GET', '/api/posts');
 
         $response->assertStatus(200)
@@ -94,7 +94,7 @@ class ApiPostsTest extends TestCase
             ]);
 
         $response = $this->withHeaders([
-            'token' => $this->user->api_token,
+            'Authorization' => 'Bearer '.$this->user->api_token,
         ])->json('GET', '/api/posts/'.$post->id);
 
         $response->assertStatus(200)
@@ -108,7 +108,7 @@ class ApiPostsTest extends TestCase
         $anotherUser = factory('App\User')->create();
         $post = factory('App\Post')->create(['user_id' => $anotherUser->id]);
         $response = $this->withHeaders([
-            'token' => $this->user->api_token,
+            'Authorization' => 'Bearer '.$this->user->api_token,
         ])->json('GET', '/api/posts');
 
         $response->assertStatus(200)
@@ -118,7 +118,7 @@ class ApiPostsTest extends TestCase
             ]);
 
         $response = $this->withHeaders([
-            'token' => $this->user->api_token,
+            'Authorization' => 'Bearer '.$this->user->api_token,
         ])->json('GET', '/api/posts/'.$post->id);
 
         $response->assertStatus(403)
@@ -135,7 +135,7 @@ class ApiPostsTest extends TestCase
         ];
 
         $response = $this->withHeaders([
-            'token' => $this->user->api_token,
+            'Authorization' => 'Bearer '.$this->user->api_token,
         ])->patch('/api/posts/'.$post->id, $postUpdated);
 
         $response->assertStatus(200)
@@ -158,7 +158,7 @@ class ApiPostsTest extends TestCase
         ];
 
         $response = $this->withHeaders([
-            'token' => $this->user->api_token,
+            'Authorization' => 'Bearer '.$this->user->api_token,
         ])->patch('/api/posts/'.$post->id, $postUpdated);
 
         $response->assertStatus(403)
@@ -171,7 +171,7 @@ class ApiPostsTest extends TestCase
         ];
 
         $response = $this->withHeaders([
-            'token' => $anotherUser->api_token,
+            'Authorization' => 'Bearer '.$anotherUser->api_token,
         ])->patch('/api/posts/'.$post->id, $postUpdatedAgain);
 
         $response->assertStatus(403)
@@ -182,7 +182,7 @@ class ApiPostsTest extends TestCase
     {
         $post = factory('App\Post')->create(['user_id' => $this->user->id]);
         $response = $this->withHeaders([
-            'token' => $this->user->api_token,
+            'Authorization' => 'Bearer '.$this->user->api_token,
         ])->delete('/api/posts/'.$post->id);
 
         $response->assertStatus(200)
@@ -196,7 +196,7 @@ class ApiPostsTest extends TestCase
         $anotherUser = factory('App\User')->create();
         $post = factory('App\Post')->create(['user_id' => $anotherUser->id]);
         $response = $this->withHeaders([
-            'token' => $this->user->api_token,
+            'Authorization' => 'Bearer '.$this->user->api_token,
         ])->delete('/api/posts/'.$post->id);
 
         $response->assertStatus(403);
