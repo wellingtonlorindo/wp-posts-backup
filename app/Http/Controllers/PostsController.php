@@ -39,7 +39,7 @@ class PostsController extends Controller
      */
     public function apiIndex()
     {
-        $posts = Auth::user()->posts()->get();
+        $posts = $this->index(true);
         return ['status' => 'success', 'posts' => $posts];
     }
 
@@ -48,10 +48,13 @@ class PostsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(bool $returnData = false)
     {
-        $user = Auth::user();
-        $posts = $user->posts()->get();
+        $posts = Auth::user()->posts()->paginate(20);
+        if ($returnData) {
+            return $posts;
+        }
+
         return view('posts.index', compact('posts'));
     }
 

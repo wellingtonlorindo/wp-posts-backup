@@ -44,9 +44,7 @@
 
                             <div class="col-md-6">
 
-                                <textarea id="post_content" class="form-control @error('post_content') is-invalid @enderror" name="post_content" value="{{ old('post_content') }}" autocomplete="post_content">
-
-                                </textarea>
+                                <textarea id="post_content" class="form-control @error('post_content') is-invalid @enderror" name="post_content" autocomplete="post_content">{{ old('post_content') }}</textarea>
 
                                 @error('post_content')
                                     <span class="invalid-feedback" role="alert">

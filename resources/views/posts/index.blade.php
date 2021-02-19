@@ -44,6 +44,12 @@
                                 </tr>
                             @endforeach
                         </table>
+                        <br>
+                        <div class="row">
+                            <div class="col-12 d-flex justify-content-center">
+                                {{ $posts->links() }}
+                            </div>
+                        </div>
 
                         <a class="btn" href="javascript:history.back()">Back</a>
                     </div>
