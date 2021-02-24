@@ -26,8 +26,12 @@
     DB_USERNAME=
     DB_PASSWORD=
 ```
+5) Migrate the database
+```
+    php artisan migrate
+```
 
-5) Finally, run on your terminal:
+6) Finally, run on your terminal:
 
 ```
     php artisan config:cache; php artisan view:cache; php artisan serve
